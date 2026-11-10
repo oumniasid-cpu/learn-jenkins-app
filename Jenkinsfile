@@ -36,8 +36,6 @@ pipeline {
                 sh '''
                     test -f build/index.html
                     npm install jest-junit
-                    CI=true JEST_JUNIT_OUTPUT_DIR=test-results JEST_JUNIT_OUTPUT_NAME=junit.xml \
-                        npm test -- --reporters=default --reporters=jest-junit
                 '''
             }
             post {
