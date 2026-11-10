@@ -38,7 +38,7 @@ pipeline {
                     steps{
                         sh '''
                             #test -f build/index.html
-                            npm test
+                            CI=true JEST_JUNIT_OUTPUT_DIR=test-results JEST_JUNIT_OUTPUT_NAME=junit.xml npm test
                         '''
                     }
                     post{
@@ -52,36 +52,35 @@ pipeline {
                stage('E2E'){
                     agent{
                         docker{
-                             image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
+                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            reuseNode true
                         }
                     }
                     steps{
                         sh '''
-                             npm install serve
-                                node_modules/.bin/serve -s build &
-                                sleep 10
-                                npx playwright test --reporter=html
+                            npm install serve
+                            node_modules/.bin/serve -s build &
+                            sleep 10
+                            npx playwright test --reporter=html
                         '''
                     }
                     post {
                         always{
                             publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false,
-                        reportDir: 'playwright-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Playwright HTML Report',
-                        reportTitles: '',
-                        useWrapperFileDirectly: true
-                    ])
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: false,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Playwright HTML Report',
+                                reportTitles: '',
+                                useWrapperFileDirectly: true
+                            ])
                         }
                     }
                }
             }
-        }  
-            
+        }
 
         stage('Deploy') {
             agent {
@@ -98,6 +97,6 @@ pipeline {
                     node_modules/.bin/netlify status
                 '''
             }
-}
+        }
     }
 }
